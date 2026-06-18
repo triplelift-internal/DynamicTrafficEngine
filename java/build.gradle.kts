@@ -14,6 +14,7 @@
 plugins {
     // Apply the java-library plugin for API and implementation separation.
     `java-library`
+    `maven-publish`
     id("io.freefair.lombok") version "9.5.0"
     id("com.gradleup.shadow") version "9.4.2"
     jacoco
@@ -232,4 +233,22 @@ tasks {
     test {
         finalizedBy(jacocoTestReport)
     }
+}
+
+project.group = "com.amazon.demanddriventrafficevaluator"
+configure<PublishingExtension> {
+publications.create<MavenPublication>("maven") {
+        from(components["java"])
+    }
+        repositories {
+                mavenLocal()
+                maven {
+                        name = "GitHub"
+                        url = uri("https://maven.pkg.github.com/${project.findProperty("gpr.repo")}")
+                        credentials {
+                                username = project.findProperty("gpr.user").toString()
+                                password = project.findProperty("gpr.key").toString()
+                        }
+                }
+        }
 }
